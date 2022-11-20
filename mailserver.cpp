@@ -8,26 +8,26 @@ using namespace std;
 MailServer :: MailServer(MailServer&&mailserver)
 {
 EmailsTobeSent=std::move (mailserver.EmailsTobeSent);
-Users=std::move(mailserver.Users);
+//Users=std::move(mailserver.Users);
+BstUsers=std::move(mailserver.BstUsers);
 }
 MailServer :: MailServer(const MailServer& mailserver)
 {
   EmailsTobeSent=(mailserver.EmailsTobeSent);
-
-    Users=(mailserver.Users);
-
+    //Users=(mailserver.Users);
+    BstUsers=(mailserver.BstUsers);
 }
+
 MailServer ::MailServer(){}
 MailServer :: ~MailServer(){}
-
 
  void MailServer :: SendEmailToDestination()
 {
     Email mail=EmailsTobeSent.front(); //emails are going to be sent by order the one that came first to server to be sent first
 
-    UserAccount reciever =Users[mail.To];
+    UserAccount reciever =BstUsers.retreive(mail.To);
 
-    UserAccount sender =Users[mail.From];
+    UserAccount sender =BstUsers.retreive(mail.To);
 
     ((reciever).Inbox).push(mail);       // mailserver will send email to reciever's inbox
 
@@ -40,7 +40,6 @@ MailServer :: ~MailServer(){}
         return;
 
     }      //if it did not reach destination keep a copy of it repush it to queue
-
     if(mail.SendingTimes==3 && !ReachedDestination())
     {
         destroy();   //if conditions are satisfied the email will be destroyed
@@ -55,9 +54,9 @@ bool MailServer :: ReachedDestination()
 
     Email mail=EmailsTobeSent.front();    // we always deal with the email which is first in the queue
 
-    UserAccount reciever=Users[mail.To];   //reciever
+    UserAccount reciever=BstUsers.retreive(mail.To);//reciever
 
-    return contains(reciever.Inbox,mail); // look in the reciever inbox if the email is there
+    return contains(reciever.Inbox, mail); // look in the reciever inbox if the email is there
 
 }
 bool MailServer::  contains(stack<Email>target,Email mail)
@@ -87,10 +86,10 @@ void MailServer :: destroy()
 
     EmailsTobeSent.pop();
 
-    NotifyUserofEror();
+    NotifyUserofError();
 }
 
-void MailServer ::NotifyUserofEror()
+void MailServer ::NotifyUserofError()
 {
 cout<<"your email did not reach destination"<<endl;
 }
@@ -111,14 +110,10 @@ MailServer& MailServer :: operator =(const MailServer& mailserver)
 
     return *this;
 }
-std::ostream& operator<<(std::ostream&,const MailServer&mailserver){
+void MailServer ::Print()const{
 
-//ap<long long int,UserAccount>::iterator cursor;
 cout<<"Users present in the server are"<<endl;
-for(auto i=mailserver.Users.begin();i!=mailserver.Users.end();i++)
-{
-cout<<(i->second)<<endl;
-}
+          BstUsers.printTree();
 }
 
 

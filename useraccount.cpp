@@ -3,7 +3,7 @@
 #include"mailserver.h"
 #include<string>
 #include"algorithm"
-
+#include<iomanip>
 using namespace std;
 class MailServer;
 
@@ -14,9 +14,8 @@ UserAccount:: UserAccount()//: m_UserName(nullptr)
 void UserAccount :: createAccount(MailServer&mailserver){
        enterUserName();
        enterUserID(mailserver);
-      (mailserver.Users).insert(std::make_pair(m_UserID,*this));// when the user create a valid ID (ID is unique)we add it to users of the mail server
+      (mailserver.BstUsers).insert(*this);// when the user create a valid ID (ID is unique)we add it to users of the mail server
      //(mailserver.Users)[m_UserID]=*this;
-
 }
 
 
@@ -81,7 +80,7 @@ void UserAccount :: enterUserID( MailServer& mailserver)
 {
    std:: cout<<"enter a valid UserID :"<<endl;
    std:: cin>> m_UserID;
-    while((mailserver.Users).count(m_UserID))
+    while((mailserver.BstUsers).contains(m_UserID))
     {
         cout<<"Id already taken try another one "<<endl;
          std::cin>> m_UserID;
@@ -130,8 +129,8 @@ UserAccount& UserAccount :: operator=(const UserAccount&user2)
 }
 std::ostream& operator<<(std::ostream&output,const UserAccount&user){
 
-output<<"the user is :"<<std::endl<<"UserName :"<<user.m_UserName<<std::endl;
-output<<"UserID:"<<user.m_UserID<<std::endl;
+output<<"UserName :"<<setw(35)<<"UserID:"<<std::endl;
+output<<user.m_UserName<<setw(35)<<user.m_UserID<<std::endl;
 return output;
 
 }
