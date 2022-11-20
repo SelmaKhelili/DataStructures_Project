@@ -3,7 +3,7 @@
 #define BSTUSERS_H
 #include<iostream>
 using std::cout;
-
+template <typename Comparable, typename user>
  class BinarySearchTree
  {
    public:
@@ -23,27 +23,24 @@ using std::cout;
  {
  	makeEmpty();
  }//distructor
- 	const long long int & findMin() const
+ 	const Comparable & findMin() const
     {
-        return  findMin(root)->user.getUserID();
+        return  findMin(root)->ID;
     }
-    UserAccount retreive(const long long int &id)
+    user retreive(const Comparable &id)
     {
        return retreive(id,root);
     }
     
-    const long long int & findMax( ) const
+    const Comparable & findMax( ) const
     {
-        return findMax(root)->user.getUserID();
+        return findMax(root)->ID;
     }
-    bool contains( const long long int & x ) const
+    bool contains( const Comparable & x ) const
     {
         return contains(x,root);
     }
-      bool contains( const UserAccount & account ) const
-    {
-        return contains(account.getUserID(),root);
-    }
+
     bool isEmpty( ) const
     {
         return root==nullptr;
@@ -53,20 +50,15 @@ using std::cout;
     {
         makeEmpty(root);
     }
-    void insert( const UserAccount & account )
+    void insert( const user & account ,const Comparable & id)
     {
-        insert(account,root);
+        insert(account,id,root);
     }
-    void insert( UserAccount && account  )
+    void insert( user && account ,Comparable && id)
     {
-        insert( std::move( account ),root );
+        insert( std::move( account ),std::move(id),root );
     }
-
-    void remove( const UserAccount & account )
-    {
-        remove(account.getUserID(),root);
-    }
-     void remove( const long long int & id )
+    void remove(const Comparable & id)
     {
         remove(id,root);
     }
@@ -91,13 +83,14 @@ using std::cout;
   private:
  	struct BinaryNode
  	{
- 		UserAccount user;
+		Comparable ID;
+ 		user User;
  		BinaryNode *left;
  		BinaryNode *right;
 
-	BinaryNode( const UserAccount& account, BinaryNode *lt, BinaryNode *rt )
-	   : user{ account }, left{ lt }, right{ rt } { }
- 		BinaryNode( UserAccount& account, BinaryNode *lt, BinaryNode *rt )
+	BinaryNode( const user& account,const Comparable& id, BinaryNode *lt, BinaryNode *rt )
+	   : user{ account },ID{id}, left{ lt }, right{ rt } { }
+ 		BinaryNode( user&& account,Comparable&& id, BinaryNode *lt, BinaryNode *rt )
  		   : user{ std::move( account ) }, left{ lt }, right{ rt } { }
  	};
 
@@ -108,54 +101,56 @@ BinaryNode * clone( BinaryNode *t ) const
 	if( t == nullptr )
     return nullptr;
 	else
-	    return new BinaryNode{ t->user, clone( t->left ), clone( t->right ) };
+	    return new BinaryNode{ t->User,t->ID, clone( t->left ), clone( t->right ) };
    }
- 	void insert( const UserAccount& x, BinaryNode * & t )
+
+ 	void insert( const user& u,const Comparable& x, BinaryNode * & t )
      {
  	if( t == nullptr )
- 	    t = new BinaryNode{ x, nullptr, nullptr };
-	else if( x.getUserID() < t->user.getUserID() )
- 	         insert( x, t->left );
- 	     else if( x.getUserID() > t->user.getUserID())
- 		      insert( x, t->right );
+ 	    t = new BinaryNode{ u,x, nullptr, nullptr };
+	else if( x < t->ID )
+ 	         insert( u,x, t->left );
+ 	     else if( x > t->ID)
+ 		      insert(u,x, t->right );
  		  else
  			; // Duplicate; do nothing
  }
-    void insert( UserAccount&& x, BinaryNode * & t )
+    void insert( user&& u,Comparable&& x, BinaryNode * & t )
      {
  	if( t == nullptr )
- 	    t = new BinaryNode{ std::move( x ), nullptr, nullptr };  
+ 	    t = new BinaryNode{ std::move( u ), std::move( x ), nullptr, nullptr };  
                  // std::move is exactly equivalent to a static_cast to an rvalue reference type
- 	else if( x.getUserID() < t->user.getUserID() )
- 		 insert( std::move( x ), t->left );
- 	     else if( x.getUserID() > t->user.getUserID() )
-	      insert( std::move( x ), t->right );
+ 	else if( x< t->ID)
+ 		 insert( std::move( u),std::move( x ), t->left );
+ 	     else if( x> t->ID )
+	      insert( std::move( u),std::move( x ), t->right );
 		  else
  			; // Duplicate; do nothing
  }
-UserAccount retreive(long long int ID,BinaryNode *t)
+user retreive(Comparable iD,BinaryNode *t)
 {
     if(t== nullptr)
      return;
-    else if(ID< t->user.getUserID())
+    else if(iD< t->ID)
      return retreive(ID,t->left);
-    else if(ID> t->user.getUserID())
-     return retreive(ID,t->right);
+    else if(iD> t->ID)
+     return retreive(iD,t->right);
     else
-      return t->user;
+      return t->User;
 }
-    void remove( const long long int & x, BinaryNode * & t )
+    void remove( const Comparable & x, BinaryNode * & t )
      {
  	if( t == nullptr )
 	    return; // Item not found; do nothing
-	if( x < t->user.getUserID())
+	if( x < t->ID)
  	    remove( x, t->left );
- 	else if( t->user.getUserID() < x )
+ 	else if( t->ID< x )
  		 remove( x, t->right );
  	     else if( t->left != nullptr && t->right != nullptr ) // Two children
  		  {
- 		      t->user=findMin( t->right )->user;
-	 	      remove( t->user.getUserID(), t->right );
+ 		      t->User=findMin( t->right )->User;
+			  t->ID=findMin( t->right )->ID;
+	 	      remove( t->ID, t->right );
  		  }
 		  else
  		  {
@@ -180,13 +175,13 @@ UserAccount retreive(long long int ID,BinaryNode *t)
  		  t = t->right;
  	return t;
  }
- 	bool contains( const long long int & x, BinaryNode *t ) const
+ 	bool contains( const Comparable & x, BinaryNode *t ) const
      {
  	if( t == nullptr )
   		 		return false;
- 	else if( x < t->user.getUserID() )
+ 	else if( x < t->ID)
          return contains( x, t->left );    
- else if( t->user.getUserID() < x )		
+ else if( t->ID < x )		
          return contains( x, t->right );	
    else	
     	return true; // Match
@@ -207,7 +202,7 @@ void printTree( BinaryNode *t, ostream & out ) const
  	if( t != nullptr )
  	{
  		printTree( t->left, out );
- 		out <<t->user<< endl;
+ 		out <<t->User<< endl;
 	printTree( t->right, out );
 	}
  }
