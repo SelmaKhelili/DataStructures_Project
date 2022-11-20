@@ -5,7 +5,7 @@
 #include<iostream>
 #include"mailserver.h"
 #include"email.h"
-
+#include"BSTUSERS.h"
 
 class Email;
 class MailServer;
@@ -13,6 +13,7 @@ using std ::string;
 
 class UserAccount
 {
+    friend BinarySearchTree;
     friend MailServer;
     friend Email;
     public:

@@ -4,6 +4,7 @@
 #include"UserAccount.h"
 #include"Email.h"
 #include<map>
+#include"BSTUSERS.h"
 #include<stack>
 class UserAccount; //forward declaration
 class Email; //forward declaration
@@ -22,19 +23,19 @@ class MailServer
         bool ReachedDestination();
         void KeepCopy();//if didnt reach destination keep copy repuch
         void destroy();
-        void NotifyUserofEror();
+        void NotifyUserofError();
         MailServer& operator =(MailServer&&); // move Assignment operator
         MailServer& operator =(const MailServer &); //  copy Assignment operator
-        friend std::ostream& operator<<(std::ostream&,const MailServer&);
+        void Print()const;
 
 
     protected:
 
     private:
-       std::map <long long int ,UserAccount> Users;
+      // std::map <long long int ,UserAccount> Users;
+       BinarySearchTree BstUsers;
        std:: queue<Email>EmailsTobeSent;
        bool contains(std::stack<Email>,Email);
-
 };
 
 #endif // MAILSERVER_H
