@@ -19,8 +19,5 @@ mailserver.SendEmailToDestination();
 cout<<user1.LastEmailSent();
 cout<<user2.LastEmailRecieved();
 
-
-
-
     return 0;
 }
